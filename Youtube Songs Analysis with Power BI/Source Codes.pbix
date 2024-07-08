@@ -1,0 +1,16 @@
+Source = Excel.Workbook(File.Contents("C:\Users\P-COMPUTERS\Desktop\TAIWO\songs.xlsx"), null, true),
+    Sheet1_Sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
+    #"Promoted Headers" = Table.PromoteHeaders(Sheet1_Sheet, [PromoteAllScalars=true]),
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Column1", Int64.Type}, {"video_id", type text}, {"channelTitle", type text}, {"title", type text}, {"description", type text}, {"tags", type text}, {"publishedAt", type datetime}, {"viewCount", Int64.Type}, {"likeCount", Int64.Type}, {"favoriteCount", Int64.Type}, {"commentCount", Int64.Type}, {"duration", type duration}, {"definition", type text}, {"caption", type logical}}),
+    #"Split Column by Delimiter" = Table.SplitColumn(Table.TransformColumnTypes(#"Changed Type", {{"publishedAt", type text}}, "en-US"), "publishedAt", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"publishedAt.1", "publishedAt.2", "publishedAt.3"}),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Split Column by Delimiter",{{"publishedAt.1", type date}, {"publishedAt.2", type time}, {"publishedAt.3", type text}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type1",{{"publishedAt.1", "Year Published"}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns",{"publishedAt.2", "publishedAt.3", "Column1"}),
+    #"Removed Duplicates" = Table.Distinct(#"Removed Columns"),
+    #"Split Column by Delimiter1" = Table.SplitColumn(#"Removed Duplicates", "title", Splitter.SplitTextByEachDelimiter({"|"}, QuoteStyle.Csv, false), {"title.1", "title.2"}),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Split Column by Delimiter1",{{"title.1", type text}, {"title.2", type text}}),
+    #"Removed Columns1" = Table.RemoveColumns(#"Changed Type2",{"title.2"}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Removed Columns1",{{"title.1", "Song Title"}}),
+    #"Removed Duplicates1" = Table.Distinct(#"Renamed Columns1")
+in
+    #"Removed Duplicates1"
