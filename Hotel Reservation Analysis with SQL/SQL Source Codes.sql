@@ -78,7 +78,7 @@ SELECT room_type_reserved, AVG(no_of_weekend_nights) AS Average_weekend_nights,
 FROM hotel_data
 GROUP BY room_type_reserved
 
-/* Most Coomon Room Type For Reservation Involving Children and its Average Price */
+/* Most Common Room Type For Reservation Involving Children and its Average Price */
 SELECT room_type_reserved, avg(avg_price_per_room) AS Average_Price
 FROM hotel_data
 WHERE no_of_children != 0
